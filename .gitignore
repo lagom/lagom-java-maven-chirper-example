@@ -17,6 +17,3 @@ project/plugins/project/
 .worksheet
 .classpath
 .project
-
-# IDEA specific
-.idea
