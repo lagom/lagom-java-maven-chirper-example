@@ -72,6 +72,8 @@ lazy val frontEnd = project("front-end")
       "org.webjars" % "foundation" % "5.3.0",
       "com.typesafe.conductr" %% "lagom10-conductr-bundle-lib" % "1.4.1"
     ),
+    // needed to resolve lagom10-conductr-bundle-lib
+    resolvers += Resolver.bintrayRepo("typesafe", "maven-releases"),
     ReactJsKeys.sourceMapInline := true,
     // ConductR settings
     BundleKeys.nrOfCpus := 1.0,
