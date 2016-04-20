@@ -1,5 +1,3 @@
-import ByteConversions._
-
 organization in ThisBuild := "sample.chirper"
 
 // the Scala version that will be used for cross-compiled libraries
@@ -69,18 +67,9 @@ lazy val frontEnd = project("front-end")
       "org.webjars" % "react" % "0.14.3",
       "org.webjars" % "react-router" % "1.0.3",
       "org.webjars" % "jquery" % "2.2.0",
-      "org.webjars" % "foundation" % "5.3.0",
-      "com.typesafe.conductr" %% "lagom10-conductr-bundle-lib" % "1.4.1"
+      "org.webjars" % "foundation" % "5.3.0"
     ),
-    // needed to resolve lagom10-conductr-bundle-lib
-    resolvers += Resolver.bintrayRepo("typesafe", "maven-releases"),
-    ReactJsKeys.sourceMapInline := true,
-    // ConductR settings
-    BundleKeys.nrOfCpus := 1.0,
-    BundleKeys.memory := 64.MiB,
-    BundleKeys.diskSpace := 35.MB,
-    BundleKeys.endpoints := Map("web" -> Endpoint("http", services = Set(URI("http://:9000")))),
-    javaOptions in Bundle ++= Seq("-Dhttp.address=$WEB_BIND_IP", "-Dhttp.port=$WEB_BIND_PORT")
+    ReactJsKeys.sourceMapInline := true
   )
 
 lazy val loadTestApi = project("load-test-api")
