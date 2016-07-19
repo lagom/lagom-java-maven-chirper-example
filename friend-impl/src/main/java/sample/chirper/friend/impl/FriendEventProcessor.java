@@ -75,7 +75,7 @@ public class FriendEventProcessor extends CassandraReadSideProcessor<FriendEvent
   }
 
   private CompletionStage<Optional<UUID>> selectOffset(CassandraSession session) {
-    return session.selectOne("SELECT offset FROM friend_offset")
+    return session.selectOne("SELECT offset FROM friend_offset WHERE partition=1")
         .thenApply(
         optionalRow -> optionalRow.map(r -> r.getUUID("offset")));
   }
