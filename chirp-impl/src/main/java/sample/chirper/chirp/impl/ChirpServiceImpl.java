@@ -7,10 +7,7 @@ import akka.NotUsed;
 import akka.stream.javadsl.Source;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.lightbend.lagom.javadsl.persistence.PersistentEntityRegistry;
-import com.lightbend.lagom.javadsl.persistence.cassandra.CassandraSession;
 import org.pcollections.PSequence;
-import play.Logger;
-import play.Logger.ALogger;
 import sample.chirper.chirp.api.Chirp;
 import sample.chirper.chirp.api.ChirpService;
 import sample.chirper.chirp.api.HistoricalChirpsRequest;
@@ -24,20 +21,17 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ChirpServiceImpl implements ChirpService {
-    private final PersistentEntityRegistry persistentEntitites;
+    private final PersistentEntityRegistry persistentEntities;
     private final ChirpTopic topic;
     private final ChirpRepository chirps;
-    private final CassandraSession db;
-    private final ALogger log = Logger.of(getClass());
 
     @Inject
-    public ChirpServiceImpl(PersistentEntityRegistry persistentEntitites, ChirpTopic topic, ChirpRepository chirps, CassandraSession db) {
-        this.persistentEntitites = persistentEntitites;
+    public ChirpServiceImpl(PersistentEntityRegistry persistentEntities, ChirpTopic topic, ChirpRepository chirps) {
+        this.persistentEntities = persistentEntities;
         this.topic = topic;
         this.chirps = chirps;
-        this.db = db;
 
-        persistentEntitites.register(ChirpTimelineEntity.class);
+        persistentEntities.register(ChirpTimelineEntity.class);
     }
 
     @Override
@@ -46,7 +40,7 @@ public class ChirpServiceImpl implements ChirpService {
             if (!userId.equals(chirp.userId))
                 throw new IllegalArgumentException("UserId " + userId + " did not match userId in " + chirp);
 
-            return persistentEntitites.refFor(ChirpTimelineEntity.class, userId)
+            return persistentEntities.refFor(ChirpTimelineEntity.class, userId)
                     .ask(new AddChirp(chirp))
                     .thenApply(done -> NotUsed.getInstance());
         };
