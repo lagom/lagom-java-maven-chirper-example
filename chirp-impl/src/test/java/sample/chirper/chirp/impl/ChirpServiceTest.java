@@ -6,7 +6,6 @@ package sample.chirper.chirp.impl;
 import akka.stream.javadsl.Source;
 import akka.stream.testkit.TestSubscriber.Probe;
 import akka.stream.testkit.javadsl.TestSink;
-import com.lightbend.lagom.javadsl.testkit.ServiceTest.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
