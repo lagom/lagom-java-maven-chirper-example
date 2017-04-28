@@ -1,4 +1,4 @@
-organization in ThisBuild := "sample.chirper"
+organization in ThisBuild := "com.lightbend.lagom.sample.chirper"
 
 // the Scala version that will be used for cross-compiled libraries
 scalaVersion in ThisBuild := "2.11.8"
@@ -63,6 +63,7 @@ lazy val activityStreamImpl = project("activity-stream-impl")
 
 lazy val frontEnd = project("front-end")
   .enablePlugins(PlayJava, LagomPlay)
+  .disablePlugins(PlayLayoutPlugin)
   .settings(
     version := "1.0-SNAPSHOT",
     routesGenerator := InjectedRoutesGenerator,
@@ -71,11 +72,20 @@ lazy val frontEnd = project("front-end")
       "org.webjars" % "react-router" % "1.0.3",
       "org.webjars" % "jquery" % "2.2.4",
       "org.webjars" % "foundation" % "5.5.2",
+      "org.webjars" %% "webjars-play" % "2.5.0",
       lagomJavadslClient
     ),
     ReactJsKeys.sourceMapInline := true,
     // Remove to use Scala IDE
-    EclipseKeys.createSrc := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
+    EclipseKeys.createSrc := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources),
+
+    sourceDirectory in Assets := baseDirectory.value / "src" / "main" / "resources" / "assets",
+    resourceDirectory in Assets := baseDirectory.value / "src" / "main" / "resources" / "public",
+
+    PlayKeys.playMonitoredFiles ++=
+      (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value :+
+      (sourceDirectory in Assets).value :+
+      (resourceDirectory in Assets).value
   )
 
 lazy val loadTestApi = project("load-test-api")
@@ -106,4 +116,3 @@ lagomCassandraCleanOnStart in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false
 
 licenses in ThisBuild := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
-

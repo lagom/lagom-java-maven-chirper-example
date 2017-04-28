@@ -1,15 +1,19 @@
-language: scala
+language: java
 sudo: false
 jdk:
   - oraclejdk8
-script:
-  - sbt +test
+env:
+  matrix:
+    - SCRIPT="mvn test"
+    - SCRIPT="sbt test"
 cache:
   directories:
+    - $HOME/.m2
     - $HOME/.ivy2/cache
 before_cache:
   # Ensure changes to the cache aren't persisted
-  - rm -rf $HOME/.ivy2/cache/sample.chirper/*
+  - rm -rf $HOME/.m2/repository/com/lightbend/lagom/sample/chirper
+  - rm -rf $HOME/.ivy2/cache/com/lightbend/lagom/sample/chirper
   # Delete all ivydata files since ivy touches them on each build
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
 notifications:
@@ -18,4 +22,3 @@ notifications:
         - https://webhooks.gitter.im/e/773aba95141768c32dae
     on_success: always
     on_failure: always
-
