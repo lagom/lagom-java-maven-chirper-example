@@ -93,6 +93,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <images>
+                        <image>
+                            <build>
+                                <entryPoint>
+                                    java -cp '/maven/*' -Dplay.crypto.secret="${APPLICATION_SECRET:-none}" -Dhttp.address="$ACTIVITY_STREAM_BIND_IP" -Dhttp.port="$ACTIVITY_STREAM_BIND_PORT" play.core.server.ProdServerStart
+                                </entryPoint>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

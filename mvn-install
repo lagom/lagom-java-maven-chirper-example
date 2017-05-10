@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -e
+
+which mvn &>/dev/null || (echo '* maven not found; did you install it?' && exit 2)
+which docker &>/dev/null || (echo '* docker not found; did you install it?' && exit 2)
+which sandbox &>/dev/null || (echo '* sandbox not found; did you install the ConductR Developer Sandbox?' && exit 2)
+
+echo "* building project"
+
+mvn clean package docker:build
+
+echo "* starting sandbox"
+
+sandbox run 2.1.0-alpha.1
+
+echo "* loading cassandra..."
+CASSANDRA_ID=$(conduct load cassandra --long-ids -q)
+
+echo "* loading activity-stream"
+ACTIVITY_STREAM_ID="$(docker save chirper/activity-stream-impl | bndl --no-default-check --endpoint activity-stream --endpoint akka-remote | conduct load --long-ids -q)"
+
+echo "* loading chirp"
+CHIRP_ID="$(docker save chirper/chirp-impl | bndl --no-default-check --endpoint chirp --endpoint akka-remote | conduct load --long-ids -q)"
+
+echo "* loading friend"
+FRIEND_ID="$(docker save chirper/friend-impl | bndl --no-default-check --endpoint friend --endpoint akka-remote | conduct load --long-ids -q)"
+
+echo "* loading front-end"
+FRONT_END_ID="$(docker save chirper/front-end | bndl --no-default-check --endpoint front-end --endpoint akka-remote | conduct load --long-ids -q)"
+
+echo "* running cassandra"
+conduct run ${CASSANDRA_ID} --no-wait -q
+
+echo "* running activity-stream"
+conduct run "$ACTIVITY_STREAM_ID"
+
+echo "* running chirp"
+conduct run "$CHIRP_ID"
+
+echo "* running friend"
+conduct run "$FRIEND_ID"
+
+echo "* running front-end"
+conduct run "$FRONT_END_ID"
