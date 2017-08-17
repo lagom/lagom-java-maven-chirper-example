@@ -124,6 +124,8 @@ if [ "$MINIKUBE" = 1 ]; then
     eval $(minikube docker-env)
 fi
 
+(kubectl get nodes &>/dev/null) || (echo '* kubectl cannot contact cluster, is it setup correctly?' && exit 1)
+
 if [ "$CONFIGURE_TLS" = 1 ]; then
     echo '****************************'
     echo '***  Configuring TLS     ***'

@@ -1,138 +1,90 @@
-# Minikube setup
+# Deploying Chirper to Kubernetes Minikube
 
-Start `minikube`.
+This page describes the steps required to deploy Chriper to your local Minikube installation. For a more detailed 
+guide and explanation of this process, please reference 
+[Deploying Lagom Microservices on Kubernetes](https://developer.lightbend.com/guides/k8s-microservices/).
 
-```
-minikube start
-```
 
-Setup docker env.
+## Prerequisites
 
-```
-eval $(minikube docker-env)
-```
+* JDK8+
+* [Maven](https://maven.apache.org/) or [sbt](http://www.scala-sbt.org/)
+* [Docker](https://www.docker.com/)
+* [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube/)
 
-# Deploy Cassandra
+## Deployment
 
-Based on https://github.com/kubernetes/kubernetes/tree/master/examples/storage/cassandra
+This repository ships with an install script that can be used to deploy the project to your local Minikube. Once
+you've installed all of the prerequisites, launch the script below. Once completed, it will print a summary and
+provide you with URLs that you can use to access Chirper in your browser.
 
-## Setup
+For more information on how Chirper on Kubernetes works, please reference
+[Deploying Lagom Microservices on Kubernetes](https://developer.lightbend.com/guides/k8s-microservices/).
 
-Pull the Cassandra docker image.
-
-```
-docker pull gcr.io/google-samples/cassandra:v12
-```
-
-## Declare Cassandra endpoints
-
-Create Service to expose Cassandra endpoints.
-
-```
-kubectl create -f deploy/k8/minikube/cassandra/cassandra-service.yaml
+##### Example Execution
+```bash
+deploy/kubernetes/scripts/install --minikube --new-minikube --all
 ```
 
-Observe the created Service.
-
 ```
-kubectl get svc cassandra
-```
+****************************
+***  Summary             ***
+****************************
+Registry:          N/A
+Minikube:          New
+Configure TLS:     Yes
+Deploy Cassandra:  Yes
+Build Chirper:     Yes
+Upload Chirper:    No
+Delete Chirper:    No
+Deploy Chirper:    Yes
+Deploy nginx:      Yes
 
-## Create Cassandra ring
+Note: You must have kubectl setup to point to your Kubernetes cluster, and be logged into your Docker registry if applicable.
 
-Since we're using minikube:
+Press anything to continue, or CTRL-C to exit
 
-* Only 1 instance.
-* No persistent volume.
+...
 
-```
-kubectl create -f deploy/k8/minikube/cassandra/cassandra-statefulset.yaml
-```
+NAME                                          READY     STATUS    RESTARTS   AGE
+po/activityservice-0                          1/1       Running   0          42s
+po/cassandra-0                                1/1       Running   0          3m
+po/chirpservice-0                             1/1       Running   0          42s
+po/friendservice-0                            1/1       Running   0          42s
+po/nginx-default-backend-1866436208-wkhhd     1/1       Running   0          21s
+po/nginx-ingress-controller-667491271-qkj31   1/1       Running   0          21s
+po/web-0                                      1/1       Running   0          41s
 
-Observe the created StatefulSet.
+NAME                                CLUSTER-IP   EXTERNAL-IP   PORT(S)                      AGE
+svc/activityservice                 None         <none>        9000/TCP                     43s
+svc/activityservice-akka-remoting   10.0.0.119   <none>        2551/TCP                     43s
+svc/cassandra                       10.0.0.67    <none>        9042/TCP                     4m
+svc/chirpservice                    None         <none>        9000/TCP                     42s
+svc/chirpservice-akka-remoting      10.0.0.184   <none>        2551/TCP                     42s
+svc/friendservice                   None         <none>        9000/TCP                     42s
+svc/friendservice-akka-remoting     10.0.0.44    <none>        2551/TCP                     42s
+svc/kubernetes                      10.0.0.1     <none>        443/TCP                      4m
+svc/nginx-default-backend           10.0.0.185   <none>        80/TCP                       21s
+svc/nginx-ingress                   10.0.0.161   <pending>     80:30458/TCP,443:30617/TCP   21s
+svc/web                             10.0.0.165   <none>        9000/TCP                     42s
 
-```
-kubectl get statefulset cassandra
-```
+NAME                           DESIRED   CURRENT   AGE
+statefulsets/activityservice   1         1         43s
+statefulsets/cassandra         1         1         4m
+statefulsets/chirpservice      1         1         42s
+statefulsets/friendservice     1         1         42s
+statefulsets/web               1         1         41s
 
-## Check Cassandra running
+NAME                              DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+deploy/nginx-default-backend      1         1         1            1           21s
+deploy/nginx-ingress-controller   1         1         1            1           21s
 
-Cassandra should be running now.
+NAME                                    DESIRED   CURRENT   READY     AGE
+rs/nginx-default-backend-1866436208     1         1         1         21s
+rs/nginx-ingress-controller-667491271   1         1         1         21s
 
-```
-kubectl get pods -l="app=cassandra"
-```
 
-Example output:
-
-```
-NAME          READY     STATUS    RESTARTS   AGE
-cassandra-0   1/1       Running   0          1m
-```
-
-Run Cassandra `nodetool`.
-
-```
-kubectl exec cassandra-0 -- nodetool status
-```
-
-Example output:
-
-```
-Datacenter: DC1-K8Demo
-======================
-Status=Up/Down
-|/ State=Normal/Leaving/Joining/Moving
---  Address     Load       Tokens       Owns (effective)  Host ID                               Rack
-UN  172.17.0.5  99.45 KiB  32           100.0%            446361b8-d005-4525-8830-04d23a43d6aa  Rack1-K8Demo
-```
-
-# Publish Chirper
-
-Publish Chirper docker images to `minikube`'s Docker registry.
-
-```
-mvn clean package docker:build
-```
-
-Once done, check if images has been published.
-
-```
-docker images
-```
-
-Expected output should be similar to the following.
-
-```
-REPOSITORY                                             TAG                 IMAGE ID            CREATED             SIZE
-chirper/front-end                                      1.0-SNAPSHOT        1a8ff0f4ba3c        18 minutes ago      145 MB
-chirper/front-end                                      latest              1a8ff0f4ba3c        18 minutes ago      145 MB
-chirper/load-test-impl                                 1.0-SNAPSHOT        b01800ca5d47        18 minutes ago      150 MB
-chirper/load-test-impl                                 latest              b01800ca5d47        18 minutes ago      150 MB
-chirper/activity-stream-impl                           1.0-SNAPSHOT        92e1f3060e8b        18 minutes ago      150 MB
-chirper/activity-stream-impl                           latest              92e1f3060e8b        18 minutes ago      150 MB
-chirper/chirp-impl                                     1.0-SNAPSHOT        a15defc9e551        18 minutes ago      150 MB
-chirper/chirp-impl                                     latest              a15defc9e551        18 minutes ago      150 MB
-chirper/friend-impl                                    1.0-SNAPSHOT        cee7f72a23ad        19 minutes ago      150 MB
-chirper/friend-impl                                    latest              cee7f72a23ad        19 minutes ago      150 MB
-```
-
-# Deploy Friend Service
-
-Deploy the Friend Service.
-
-```
-kubectl create -f deploy/k8/minikube/lagom/friend-impl/friend-impl-statefulset.json
-```
-
-Check deploy status.
-
-```
-kubectl get pods -l="app=friendservice"
-```
-
-View the complete pod status.
-
-```
-kubectl describe pod friendservice
+Chirper UI (HTTP): http://192.168.99.100:30458
+Chirper UI (HTTPS): https://192.168.99.100:30617
+Kubernetes Dashboard: http://192.168.99.100:30000
 ```
