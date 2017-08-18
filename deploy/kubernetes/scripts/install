@@ -99,9 +99,10 @@ echo "Delete Chirper:    $([ "$DELETE_CHIRPER" = 1 ]   && echo "Yes" || echo "No
 echo "Deploy Chirper:    $([ "$DEPLOY_CHIRPER" = 1 ]   && echo "Yes" || echo "No")"
 echo "Deploy nginx:      $([ "$DEPLOY_NGINX" = 1 ]     && echo "Yes" || echo "No")"
 echo
-
+if [ "$MINIKUBE" = 0 ]; then
 echo 'Note: You must have kubectl setup to point to your Kubernetes cluster, and be logged into your Docker registry if applicable.'
 echo
+fi
 read -p 'Press anything to continue, or CTRL-C to exit'
 
 wait-for-pods() {
@@ -117,7 +118,7 @@ if [ "$MINIKUBE_RESET" = "1" ]; then
 
     (minikube delete || true) &>/dev/null
 
-    minikube start --memory 8192
+    minikube start --memory 4096
 fi
 
 if [ "$MINIKUBE" = 1 ]; then
