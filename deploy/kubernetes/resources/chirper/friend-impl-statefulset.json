@@ -59,12 +59,8 @@
                 "value": "$HOSTNAME.friendservice.default.svc.cluster.local"
               },
               {
-                "name": "AKKA_SEED_NODE_PORT",
-                "value": "2551"
-              },
-              {
-                "name": "AKKA_SEED_NODE_HOST",
-                "value": "friendservice-0.friendservice.default.svc.cluster.local"
+                "name": "AKKA_SEED_NODES",
+                "value": "friendservice-0.friendservice.default.svc.cluster.local:2551,friendservice-1.friendservice.default.svc.cluster.local:2551,friendservice-2.friendservice.default.svc.cluster.local:2551"
               },
               {
                 "name": "POD_NAME",
