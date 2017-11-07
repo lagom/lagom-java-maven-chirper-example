@@ -12,36 +12,43 @@ scalaVersion in ThisBuild := "2.11.8"
 // SCALA SUPPORT: Remove the line below
 EclipseKeys.projectFlavor in Global := EclipseProjectFlavor.Java
 
+lazy val buildVersion = sys.props.getOrElse("buildVersion", "1.0.0-SNAPSHOT")
+
 lazy val friendApi = project("friend-api")
   .settings(
-    version := "1.0-SNAPSHOT",
+    version := buildVersion,
     libraryDependencies += lagomJavadslApi
   )
 
 lazy val friendImpl = project("friend-impl")
   .enablePlugins(LagomJava)
   .settings(
-    version := "1.0-SNAPSHOT",
-    dockerRepository := Some("chirper"),
+    version := buildVersion,
+    version in Docker := buildVersion,
+    dockerBaseImage := "openjdk:8-jre-alpine",
+    dockerRepository := Some(BuildTarget.dockerRepository),
     dockerUpdateLatest := true,
-    dockerEntrypoint ++= """-Dplay.crypto.secret="${APPLICATION_SECRET:-none}" -Dplay.akka.actor-system="${AKKA_ACTOR_SYSTEM_NAME:-friendservice-v1}" -Dhttp.address="$FRIENDSERVICE_BIND_IP" -Dhttp.port="$FRIENDSERVICE_BIND_PORT" -Dakka.actor.provider=cluster -Dakka.remote.netty.tcp.hostname="$(eval "echo $AKKA_REMOTING_BIND_HOST")" -Dakka.remote.netty.tcp.port="$AKKA_REMOTING_BIND_PORT" $(IFS=','; I=0; for NODE in $AKKA_SEED_NODES; do echo "-Dakka.cluster.seed-nodes.$I=akka.tcp://$AKKA_ACTOR_SYSTEM_NAME@$NODE"; I=$(expr $I + 1); done) -Dakka.io.dns.resolver=async-dns -Dakka.io.dns.async-dns.resolve-srv=true -Dakka.io.dns.async-dns.resolv-conf=on""".split(" ").toSeq,
+    dockerEntrypoint ++= """-Dhttp.address="$(eval "echo $FRIENDSERVICE_BIND_IP")" -Dhttp.port="$(eval "echo $FRIENDSERVICE_BIND_PORT")" -Dakka.remote.netty.tcp.hostname="$(eval "echo $AKKA_REMOTING_HOST")" -Dakka.remote.netty.tcp.bind-hostname="$(eval "echo $AKKA_REMOTING_BIND_HOST")" -Dakka.remote.netty.tcp.port="$(eval "echo $AKKA_REMOTING_PORT")" -Dakka.remote.netty.tcp.bind-port="$(eval "echo $AKKA_REMOTING_BIND_PORT")" $(IFS=','; I=0; for NODE in $AKKA_SEED_NODES; do echo "-Dakka.cluster.seed-nodes.$I=akka.tcp://friendservice@$NODE"; I=$(expr $I + 1); done)""".split(" ").toSeq,
     dockerCommands :=
       dockerCommands.value.flatMap {
         case ExecCmd("ENTRYPOINT", args @ _*) => Seq(Cmd("ENTRYPOINT", args.mkString(" ")))
+        case c @ Cmd("FROM", _) => Seq(c, ExecCmd("RUN", "/bin/sh", "-c", "apk add --no-cache bash && ln -sf /bin/bash /bin/sh"))
         case v => Seq(v)
       },
     resolvers += bintrayRepo("hajile", "maven"),
+    resolvers += bintrayRepo("hseeberger", "maven"),
     libraryDependencies ++= Seq(
       lagomJavadslPersistenceCassandra,
       lagomJavadslTestKit
-    ) ++ BuildTarget.additionalLibraryDependencies
+    )
   )
+  .settings(BuildTarget.additionalSettings)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(friendApi)
 
 lazy val chirpApi = project("chirp-api")
   .settings(
-    version := "1.0-SNAPSHOT",
+    version := buildVersion,
     libraryDependencies ++= Seq(
       lagomJavadslApi,
       lagomJavadslJackson
@@ -51,28 +58,34 @@ lazy val chirpApi = project("chirp-api")
 lazy val chirpImpl = project("chirp-impl")
   .enablePlugins(LagomJava)
   .settings(
-    version := "1.0-SNAPSHOT",
-    dockerRepository := Some("chirper"),
+    version := buildVersion,
+    version in Docker := buildVersion,
+    dockerBaseImage := "openjdk:8-jre-alpine",
+    dockerRepository := Some(BuildTarget.dockerRepository),
     dockerUpdateLatest := true,
-    dockerEntrypoint ++= """-Dplay.crypto.secret="${APPLICATION_SECRET:-none}" -Dplay.akka.actor-system="${AKKA_ACTOR_SYSTEM_NAME:-chirpservice-v1}" -Dhttp.address="$CHIRPSERVICE_BIND_IP" -Dhttp.port="$CHIRPSERVICE_BIND_PORT" -Dakka.actor.provider=cluster -Dakka.remote.netty.tcp.hostname="$(eval "echo $AKKA_REMOTING_BIND_HOST")" -Dakka.remote.netty.tcp.port="$AKKA_REMOTING_BIND_PORT" $(IFS=','; I=0; for NODE in $AKKA_SEED_NODES; do echo "-Dakka.cluster.seed-nodes.$I=akka.tcp://$AKKA_ACTOR_SYSTEM_NAME@$NODE"; I=$(expr $I + 1); done) -Dakka.io.dns.resolver=async-dns -Dakka.io.dns.async-dns.resolve-srv=true -Dakka.io.dns.async-dns.resolv-conf=on""".split(" ").toSeq,
+    dockerEntrypoint ++= """-Dhttp.address="$(eval "echo $CHIRPSERVICE_BIND_IP")" -Dhttp.port="$(eval "echo $CHIRPSERVICE_BIND_PORT")" -Dakka.remote.netty.tcp.hostname="$(eval "echo $AKKA_REMOTING_HOST")" -Dakka.remote.netty.tcp.bind-hostname="$(eval "echo $AKKA_REMOTING_BIND_HOST")" -Dakka.remote.netty.tcp.port="$(eval "echo $AKKA_REMOTING_PORT")" -Dakka.remote.netty.tcp.bind-port="$(eval "echo $AKKA_REMOTING_BIND_PORT")" $(IFS=','; I=0; for NODE in $AKKA_SEED_NODES; do echo "-Dakka.cluster.seed-nodes.$I=akka.tcp://chirpservice@$NODE"; I=$(expr $I + 1); done)""".split(" ").toSeq,
     dockerCommands :=
       dockerCommands.value.flatMap {
         case ExecCmd("ENTRYPOINT", args @ _*) => Seq(Cmd("ENTRYPOINT", args.mkString(" ")))
+        case c @ Cmd("FROM", _) => Seq(c, ExecCmd("RUN", "/bin/sh", "-c", "apk add --no-cache bash && ln -sf /bin/bash /bin/sh"))
         case v => Seq(v)
       },
     resolvers += bintrayRepo("hajile", "maven"),
+    resolvers += bintrayRepo("hseeberger", "maven"),
     libraryDependencies ++= Seq(
       lagomJavadslPersistenceCassandra,
       lagomJavadslPubSub,
       lagomJavadslTestKit
-    ) ++ BuildTarget.additionalLibraryDependencies
+    )
   )
+  .settings(BuildTarget.additionalSettings)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(chirpApi)
 
 lazy val activityStreamApi = project("activity-stream-api")
   .settings(
-    version := "1.0-SNAPSHOT",
+    version := buildVersion,
+    version in Docker := buildVersion,
     libraryDependencies += lagomJavadslApi
   )
   .dependsOn(chirpApi)
@@ -80,43 +93,52 @@ lazy val activityStreamApi = project("activity-stream-api")
 lazy val activityStreamImpl = project("activity-stream-impl")
   .enablePlugins(LagomJava)
   .settings(
-    version := "1.0-SNAPSHOT",
-    dockerRepository := Some("chirper"),
+    version := buildVersion,
+    version in Docker := buildVersion,
+    dockerBaseImage := "openjdk:8-jre-alpine",
+    dockerRepository := Some(BuildTarget.dockerRepository),
     dockerUpdateLatest := true,
-    dockerEntrypoint ++= """-Dplay.crypto.secret="${APPLICATION_SECRET:-none}" -Dplay.akka.actor-system="${AKKA_ACTOR_SYSTEM_NAME:-activityservice-v1}" -Dhttp.address="$ACTIVITYSERVICE_BIND_IP" -Dhttp.port="$ACTIVITYSERVICE_BIND_PORT" -Dakka.actor.provider=cluster -Dakka.remote.netty.tcp.hostname="$(eval "echo $AKKA_REMOTING_BIND_HOST")" -Dakka.remote.netty.tcp.port="$AKKA_REMOTING_BIND_PORT" $(IFS=','; I=0; for NODE in $AKKA_SEED_NODES; do echo "-Dakka.cluster.seed-nodes.$I=akka.tcp://$AKKA_ACTOR_SYSTEM_NAME@$NODE"; I=$(expr $I + 1); done) -Dakka.io.dns.resolver=async-dns -Dakka.io.dns.async-dns.resolve-srv=true -Dakka.io.dns.async-dns.resolv-conf=on""".split(" ").toSeq,
+    dockerEntrypoint ++= """-Dhttp.address="$(eval "echo $ACTIVITYSERVICE_BIND_IP")" -Dhttp.port="$(eval "echo $ACTIVITYSERVICE_BIND_PORT")"""".split(" ").toSeq,
     dockerCommands :=
       dockerCommands.value.flatMap {
         case ExecCmd("ENTRYPOINT", args @ _*) => Seq(Cmd("ENTRYPOINT", args.mkString(" ")))
+        case c @ Cmd("FROM", _) => Seq(c, ExecCmd("RUN", "/bin/sh", "-c", "apk add --no-cache bash && ln -sf /bin/bash /bin/sh"))
         case v => Seq(v)
       },
     resolvers += bintrayRepo("hajile", "maven"),
+    resolvers += bintrayRepo("hseeberger", "maven"),
     libraryDependencies ++= Seq(
       lagomJavadslCluster,
       lagomJavadslTestKit
-    ) ++ BuildTarget.additionalLibraryDependencies
+    )
   )
+  .settings(BuildTarget.additionalSettings)
   .dependsOn(activityStreamApi, chirpApi, friendApi)
 
 lazy val frontEnd = project("front-end")
   .enablePlugins(PlayJava, LagomPlay)
   .disablePlugins(PlayLayoutPlugin)
   .settings(
-    version := "1.0-SNAPSHOT",
+    version := buildVersion,
+    version in Docker := buildVersion,
     routesGenerator := InjectedRoutesGenerator,
-    dockerRepository := Some("chirper"),
+    dockerBaseImage := "openjdk:8-jre-alpine",
+    dockerRepository := Some(BuildTarget.dockerRepository),
     dockerUpdateLatest := true,
-    dockerEntrypoint ++= """-Dplay.crypto.secret="${APPLICATION_SECRET:-none}" -Dhttp.address="$WEB_BIND_IP" -Dhttp.port="$WEB_BIND_PORT"""".split(" ").toSeq,
+    dockerEntrypoint ++= """-Dhttp.address="$(eval "echo $WEB_BIND_IP")" -Dhttp.port="$(eval "echo $WEB_BIND_PORT")"""".split(" ").toSeq,
     dockerCommands :=
       dockerCommands.value.flatMap {
         case ExecCmd("ENTRYPOINT", args @ _*) => Seq(Cmd("ENTRYPOINT", args.mkString(" ")))
+        case c @ Cmd("FROM", _) => Seq(c, ExecCmd("RUN", "/bin/sh", "-c", "apk add --no-cache bash && ln -sf /bin/bash /bin/sh"))
         case v => Seq(v)
       },
     resolvers += bintrayRepo("hajile", "maven"),
+    resolvers += bintrayRepo("hseeberger", "maven"),
     libraryDependencies ++= Seq(
       "org.webjars" % "foundation" % "5.5.2",
       "org.webjars" %% "webjars-play" % "2.5.0",
       lagomJavadslClient
-    ) ++ BuildTarget.additionalLibraryDependencies,
+    ),
 
     includeFilter in webpack := "*.js" || "*.jsx",
     compile in Compile := (compile in Compile).dependsOn(webpack.toTask("")).value,
@@ -153,20 +175,23 @@ lazy val frontEnd = project("front-end")
     // Remove to use Scala IDE
     EclipseKeys.createSrc := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
   )
+  .settings(BuildTarget.additionalSettings)
 
 lazy val loadTestApi = project("load-test-api")
   .settings(
-    version := "1.0-SNAPSHOT",
+    version := buildVersion,
     libraryDependencies += lagomJavadslApi
   )
 
 lazy val loadTestImpl = project("load-test-impl")
   .enablePlugins(LagomJava)
   .settings(
-    version := "1.0-SNAPSHOT",
+    version := buildVersion,
+    version in Docker := buildVersion,
     resolvers += bintrayRepo("hajile", "maven"),
-    libraryDependencies ++= BuildTarget.additionalLibraryDependencies
+    resolvers += bintrayRepo("hseeberger", "maven")
    )
+  .settings(BuildTarget.additionalSettings)
   .dependsOn(loadTestApi, friendApi, activityStreamApi, chirpApi)
 
 def project(id: String) = Project(id, base = file(id))

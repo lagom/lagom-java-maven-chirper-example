@@ -172,6 +172,14 @@
           <enabled>false</enabled>
         </snapshots>
       </repository>
+      <repository>
+        <id>hseeberger</id>
+        <name>hseeberger</name>
+        <url>https://dl.bintray.com/hseeberger/maven</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+      </repository>
     </repositories>
 
     <profiles>
@@ -184,7 +192,10 @@
           <serviceLocator.provider.artifactVersion>1.9.1</serviceLocator.provider.artifactVersion>
         </properties>
         <activation>
-          <activeByDefault>false</activeByDefault>
+            <property>
+                <name>buildTarget</name>
+                <value>conductr</value>
+            </property>
         </activation>
       </profile>
 
@@ -193,12 +204,60 @@
         <properties>
           <buildTarget>kubernetes</buildTarget>
           <serviceLocator.provider.groupName>com.lightbend</serviceLocator.provider.groupName>
-          <serviceLocator.provider.artifactName>lagom-service-locator-dns_2.11</serviceLocator.provider.artifactName>
-          <serviceLocator.provider.artifactVersion>1.0.2</serviceLocator.provider.artifactVersion>
+          <serviceLocator.provider.artifactName>lagom13-java-service-locator-dns_2.11</serviceLocator.provider.artifactName>
+          <serviceLocator.provider.artifactVersion>2.2.2</serviceLocator.provider.artifactVersion>
         </properties>
         <activation>
-          <activeByDefault>true</activeByDefault>
+            <activeByDefault>true</activeByDefault>
         </activation>
+        <build>
+          <resources>
+              <resource>
+                  <directory>src/main/resources</directory>
+              </resource>
+              <resource>
+                  <directory>src/main/marathon-resources</directory>
+              </resource>
+          </resources>
+        </build>
+      </profile>
+
+      <profile>
+        <id>marathon</id>
+        <properties>
+            <buildTarget>marathon</buildTarget>
+            <serviceLocator.provider.groupName>com.lightbend</serviceLocator.provider.groupName>
+            <serviceLocator.provider.artifactName>lagom13-java-service-locator-dns_2.11</serviceLocator.provider.artifactName>
+            <serviceLocator.provider.artifactVersion>2.2.2</serviceLocator.provider.artifactVersion>
+        </properties>
+        <activation>
+            <property>
+                <name>buildTarget</name>
+                <value>marathon</value>
+            </property>
+        </activation>
+        <dependencies>
+            <dependency>
+                <groupId>de.heikoseeberger</groupId>
+                <artifactId>constructr_2.11</artifactId>
+                <version>0.17.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lightbend.constructr</groupId>
+                <artifactId>constructr-coordination-zookeeper_2.11</artifactId>
+                <version>0.4.0</version>
+            </dependency>
+        </dependencies>
+        <build>
+          <resources>
+              <resource>
+                  <directory>src/main/resources</directory>
+              </resource>
+              <resource>
+                  <directory>src/main/marathon-resources</directory>
+              </resource>
+          </resources>
+        </build>
       </profile>
     </profiles>
 </project>

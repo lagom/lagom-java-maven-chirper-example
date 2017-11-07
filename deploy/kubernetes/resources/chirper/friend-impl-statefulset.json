@@ -31,12 +31,17 @@
             ],
             "env": [
               {
-                "name": "CASSANDRA_SERVICE_NAME",
-                "value": "_native._tcp.cassandra.default.svc.cluster.local"
+                "_NOTE0": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+                "_NOTE1": "!!! Be sure to change APPLICATION_SECRET's value (below) before deploying !!!",
+
+                "name": "APPLICATION_SECRET",
+                "value": "changeme!",
+
+                "_NOTE2": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
               },
               {
-                "name": "APPLICATION_SECRET",
-                "value": "friendservice-application-secret"
+                "name": "CASSANDRA_SERVICE_NAME",
+                "value": "_native._tcp.cassandra.default.svc.cluster.local"
               },
               {
                 "name": "FRIENDSERVICE_BIND_PORT",
@@ -47,12 +52,16 @@
                 "value": "0.0.0.0"
               },
               {
-                "name": "AKKA_ACTOR_SYSTEM_NAME",
-                "value": "friendservice-v1"
+                "name": "AKKA_REMOTING_PORT",
+                "value": "2551"
               },
               {
                 "name": "AKKA_REMOTING_BIND_PORT",
                 "value": "2551"
+              },
+              {
+                "name": "AKKA_REMOTING_HOST",
+                "value": "$HOSTNAME.friendservice.default.svc.cluster.local"
               },
               {
                 "name": "AKKA_REMOTING_BIND_HOST",
@@ -61,22 +70,6 @@
               {
                 "name": "AKKA_SEED_NODES",
                 "value": "friendservice-0.friendservice.default.svc.cluster.local:2551,friendservice-1.friendservice.default.svc.cluster.local:2551,friendservice-2.friendservice.default.svc.cluster.local:2551"
-              },
-              {
-                "name": "POD_NAME",
-                "valueFrom": {
-                  "fieldRef": {
-                    "fieldPath": "metadata.name"
-                  }
-                }
-              },
-              {
-                "name": "POD_NAMESPACE",
-                "valueFrom": {
-                  "fieldRef": {
-                    "fieldPath": "metadata.namespace"
-                  }
-                }
               }
             ],
             "readinessProbe": {

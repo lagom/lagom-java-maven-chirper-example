@@ -5,6 +5,7 @@ REGISTRY=""
 CONFIGURE_TLS=0
 DEPLOY_CASSANDRA=0
 BUILD_CHIRPER=0
+BUILD_CHIRPER_SBT=0
 UPLOAD_CHIRPER=0
 DEPLOY_CHIRPER=0
 DELETE_CHIRPER=0
@@ -55,6 +56,11 @@ while test $# -gt 0; do
             ;;
         --build)
             BUILD_CHIRPER=1
+            BUILD_CHIRPER_SBT=0
+            ;;
+        --build-sbt)
+            BUILD_CHIRPER_SBT=1
+            BUILD_CHIRPER=0
             ;;
         --deploy)
             DEPLOY_CHIRPER=1
@@ -69,6 +75,7 @@ while test $# -gt 0; do
             CONFIGURE_TLS=1
             DEPLOY_CASSANDRA=1
             BUILD_CHIRPER=1
+            BUILD_CHIRPER_SBT=0
             DEPLOY_CHIRPER=1
             DEPLOY_NGINX=1
             ;;
@@ -93,15 +100,16 @@ echo '****************************'
 echo '***  Summary             ***'
 echo '****************************'
 
-echo "Registry:          $([ "$REGISTRY" = "" ]        && echo "N/A" || echo "$REGISTRY")"
-echo "Minikube:          $([ "$MINIKUBE" = 1 ]         && echo "$([ "$MINIKUBE_RESET" = 1 ] && echo "New" || echo "Yes")" || echo "No")"
-echo "Configure TLS:     $([ "$CONFIGURE_TLS" = 1 ]    && echo "Yes" || echo "No")"
-echo "Deploy Cassandra:  $([ "$DEPLOY_CASSANDRA" = 1 ] && echo "Yes" || echo "No")"
-echo "Build Chirper:     $([ "$BUILD_CHIRPER" = 1 ]    && echo "Yes" || echo "No")"
-echo "Upload Chirper:    $([ "$UPLOAD_CHIRPER" = 1 ]   && echo "Yes" || echo "No")"
-echo "Delete Chirper:    $([ "$DELETE_CHIRPER" = 1 ]   && echo "Yes" || echo "No")"
-echo "Deploy Chirper:    $([ "$DEPLOY_CHIRPER" = 1 ]   && echo "Yes" || echo "No")"
-echo "Deploy nginx:      $([ "$DEPLOY_NGINX" = 1 ]     && echo "Yes" || echo "No")"
+echo "Registry:            $([ "$REGISTRY" = "" ]         && echo "N/A" || echo "$REGISTRY")"
+echo "Minikube:            $([ "$MINIKUBE" = 1 ]          && echo "$([ "$MINIKUBE_RESET" = 1 ] && echo "New" || echo "Yes")" || echo "No")"
+echo "Configure TLS:       $([ "$CONFIGURE_TLS" = 1 ]     && echo "Yes" || echo "No")"
+echo "Deploy Cassandra:    $([ "$DEPLOY_CASSANDRA" = 1 ]  && echo "Yes" || echo "No")"
+echo "Build Chirper:       $([ "$BUILD_CHIRPER" = 1 ]     && echo "Yes (Maven)" || echo "$([ "$BUILD_CHIRPER_SBT" = 1 ] && echo "Yes (SBT)" || echo "No")")"
+echo "Upload Chirper:      $([ "$UPLOAD_CHIRPER" = 1 ]    && echo "Yes" || echo "No")"
+echo "Delete Chirper:      $([ "$DELETE_CHIRPER" = 1 ]    && echo "Yes" || echo "No")"
+echo "Deploy Chirper:      $([ "$DEPLOY_CHIRPER" = 1 ]    && echo "Yes" || echo "No")"
+echo "Deploy nginx:        $([ "$DEPLOY_NGINX" = 1 ]      && echo "Yes" || echo "No")"
+
 echo
 if [ "$MINIKUBE" = 0 ]; then
 echo 'Note: You must have kubectl setup to point to your Kubernetes cluster, and be logged into your Docker registry if applicable.'
@@ -123,6 +131,16 @@ if [ "$MINIKUBE_RESET" = "1" ]; then
     (minikube delete || true) &>/dev/null
 
     minikube start --memory 4096
+
+    echo '*******************************'
+    echo '***  Initializing minikube  ***'
+    echo '*******************************'
+
+    # some strange race condition with minikube where it isn't
+    # fully initialized and creating resources can fail. So
+    # we wait for 30 seconds. Ick.
+
+    sleep 30
 fi
 
 if [ "$MINIKUBE" = 1 ]; then
@@ -157,11 +175,19 @@ if [ "$DEPLOY_CASSANDRA" = 1 ]; then
 fi
 
 if [ "$BUILD_CHIRPER" = 1 ]; then
-    echo '****************************'
-    echo '***  Building chirper    ***'
-    echo '****************************'
+    echo '*******************************'
+    echo '***  Building chirper (mvn) ***'
+    echo '*******************************'
 
-    (cd "$RESOURCES_PATH/../../.." && mvn clean package docker:build)
+    (cd "$RESOURCES_PATH/../../.." && mvn -DbuildTarget=kubernetes clean package docker:build)
+fi
+
+if [ "$BUILD_CHIRPER_SBT" = 1 ]; then
+    echo '*******************************'
+    echo '***  Building chirper (sbt) ***'
+    echo '*******************************'
+
+    (cd "$RESOURCES_PATH/../../.." && sbt -DbuildTarget=kubernetes clean docker:publishLocal)
 fi
 
 if [ "$UPLOAD_CHIRPER" = 1 ]; then

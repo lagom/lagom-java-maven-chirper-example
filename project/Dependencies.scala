@@ -1,9 +1,13 @@
 import sbt._
 
 object Version {
-  val serviceLocatorDns = "1.0.2"
+  val constructr = "0.17.0"
+  val constructrZooKeeper = "0.4.0"
+  val serviceLocatorDns = "2.2.2"
 }
 
 object Library {
-  val serviceLocatorDns = "com.lightbend" %% "lagom-service-locator-dns" % Version.serviceLocatorDns
+  val constructr          = "de.heikoseeberger"        %% "constructr"                        % Version.constructr
+  val constructrZooKeeper = "com.lightbend.constructr" %% "constructr-coordination-zookeeper" % Version.constructrZooKeeper
+  val serviceLocatorDns   = "com.lightbend"            %% "lagom13-java-service-locator-dns"  % Version.serviceLocatorDns
 }
