@@ -32,14 +32,12 @@
             ],
             "env": [
               {
-                "_NOTE0": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-                "_NOTE1": "!!! Be sure to change APPLICATION_SECRET's value (below) before deploying !!!",
-
                 "name": "APPLICATION_SECRET",
-                "value": "changeme!",
-
-                "_NOTE2": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                "value": "ATTENTION_BE_SURE_TO_CHANGE_ME!!!!"
               },
+
+
+
               {
                 "name": "ACTIVITYSERVICE_BIND_PORT",
                 "value": "9000"

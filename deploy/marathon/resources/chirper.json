@@ -19,13 +19,7 @@
         "ACTIVITYSERVICE_BIND_IP": "0.0.0.0",
         "ACTIVITYSERVICE_BIND_PORT": "$PORT0",
 
-
-        "_NOTE0": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-        "_NOTE1": "!!! Be sure to change APPLICATION_SECRET (below) before deploying !!!",
-        "APPLICATION_SECRET": "changeme!",
-        "_NOTE2": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-
-
+        "APPLICATION_SECRET": "ATTENTION_BE_SURE_TO_CHANGE_ME!!!!"
       },
       "labels": {
         "HAPROXY_GROUP": "external",
@@ -67,12 +61,7 @@
         "AKKA_REMOTING_BIND_PORT": "$PORT1",
 
 
-        "_NOTE0": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-        "_NOTE1": "!!! Be sure to change APPLICATION_SECRET (below) before deploying !!!",
-        "APPLICATION_SECRET": "changeme!",
-        "_NOTE2": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-
-
+        "APPLICATION_SECRET": "ATTENTION_BE_SURE_TO_CHANGE_ME!!!!"
       },
       "labels": {
         "HAPROXY_GROUP": "external",
@@ -114,11 +103,7 @@
         "AKKA_REMOTING_BIND_PORT": "$PORT1",
 
 
-        "_NOTE0": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-        "_NOTE1": "!!! Be sure to change APPLICATION_SECRET (below) before deploying !!!",
-        "APPLICATION_SECRET": "changeme!",
-        "_NOTE2": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-
+        "APPLICATION_SECRET": "ATTENTION_BE_SURE_TO_CHANGE_ME!!!!"
       },
       "labels": {
         "HAPROXY_GROUP": "external",
@@ -153,11 +138,7 @@
         "WEB_BIND_PORT": "$PORT0",
 
 
-        "_NOTE0": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-        "_NOTE1": "!!! Be sure to change APPLICATION_SECRET (below) before deploying !!!",
-        "APPLICATION_SECRET": "changeme!",
-        "_NOTE2": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-
+        "APPLICATION_SECRET": "ATTENTION_BE_SURE_TO_CHANGE_ME!!!!"
       },
       "labels": {
         "HAPROXY_GROUP": "external",
