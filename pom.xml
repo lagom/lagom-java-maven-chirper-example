@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.lightbend.lagom.sample.chirper</groupId>
     <artifactId>lagom-java-chirper</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -36,7 +36,6 @@
                         <configuration>
                           <target>
                             <echo>Build target: ${buildTarget}</echo>
-                            <echo>Service Locator provided by: ${serviceLocator.provider.groupName}.${serviceLocator.provider.artifactName}:${serviceLocator.provider.artifactVersion}</echo>
                           </target>
                         </configuration>
           		    </execution>
@@ -92,7 +91,7 @@
                     <skip>true</skip>
                     <images>
                         <image>
-                            <name>%g/%a:%l</name>
+                            <name>%a:%l</name>
                             <build>
                                 <from>openjdk:8-jre-alpine</from>
                                 <tags>
@@ -119,6 +118,22 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
+            <!-- akka management (cluster formation) -->
+            <dependency>
+                <groupId>com.lightbend.akka.management</groupId>
+                <artifactId>akka-management_${scala.binary.version}</artifactId>
+                <version>0.10.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lightbend.akka.management</groupId>
+                <artifactId>akka-management-cluster-bootstrap_${scala.binary.version}</artifactId>
+                <version>0.10.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lightbend.akka.discovery</groupId>
+                <artifactId>akka-discovery-dns_${scala.binary.version}</artifactId>
+                <version>0.10.0</version>
+            </dependency>
             <!-- front-end webjars -->
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -128,7 +143,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>foundation</artifactId>
-                <version>6.4.2</version>
+                <version>5.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -145,11 +160,11 @@
                 <artifactId>jquery</artifactId>
                 <version>2.2.4</version>
             </dependency>
-            <!-- Service Locator Provider -->
+            <!-- reactive-lib service locator -->
             <dependency>
-                <groupId>${serviceLocator.provider.groupName}</groupId>
-                <artifactId>${serviceLocator.provider.artifactName}</artifactId>
-                <version>${serviceLocator.provider.artifactVersion}</version>
+                <groupId>com.lightbend.rp</groupId>
+                <artifactId>reactive-lib-service-discovery-lagom14-java_${scala.binary.version}</artifactId>
+                <version>0.6.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -158,59 +173,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lagom.version>1.4.2</lagom.version>
         <scala.binary.version>2.12</scala.binary.version>
-        <!--
-        <conductr.lib.name>lagom1-java-conductr-bundle-lib_${scala.binary.version}</conductr.lib.name>
-        -->
     </properties>
-
-
-    <repositories>
-      <repository>
-        <id>akka-dns</id>
-        <name>akka-dns</name>
-        <url>https://dl.bintray.com/hajile/maven</url>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-      </repository>
-      <repository>
-        <id>hseeberger</id>
-        <name>hseeberger</name>
-        <url>https://dl.bintray.com/hseeberger/maven</url>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-      </repository>
-    </repositories>
 
     <profiles>
       <profile>
-        <id>conductr</id>
-        <properties>
-          <buildTarget>conductr</buildTarget>
-          <serviceLocator.provider.groupName>com.typesafe.conductr</serviceLocator.provider.groupName>
-          <serviceLocator.provider.artifactName>lagom14-java-conductr-bundle-lib_${scala.binary.version}</serviceLocator.provider.artifactName>
-          <serviceLocator.provider.artifactVersion>2.1.1</serviceLocator.provider.artifactVersion>
-        </properties>
-        <activation>
-            <property>
-                <name>buildTarget</name>
-                <value>conductr</value>
-            </property>
-        </activation>
-      </profile>
-
-      <profile>
         <id>kubernetes</id>
-        <properties>
-          <buildTarget>kubernetes</buildTarget>
-          <serviceLocator.provider.groupName>com.lightbend</serviceLocator.provider.groupName>
-          <serviceLocator.provider.artifactName>lagom14-java-service-locator-dns_${scala.binary.version}</serviceLocator.provider.artifactName>
-          <serviceLocator.provider.artifactVersion>2.2.3</serviceLocator.provider.artifactVersion>
-        </properties>
         <activation>
-            <activeByDefault>true</activeByDefault>
+          <property>
+              <name>buildTarget</name>
+              <value>kubernetes</value>
+          </property>
         </activation>
+        <dependencies>
+          <dependency>
+              <groupId>com.lightbend.akka.discovery</groupId>
+              <artifactId>akka-discovery-kubernetes-api_${scala.binary.version}</artifactId>
+              <version>0.10.0</version>
+          </dependency>
+        </dependencies>
         <build>
           <resources>
               <resource>
@@ -222,15 +202,8 @@
           </resources>
         </build>
       </profile>
-
       <profile>
         <id>marathon</id>
-        <properties>
-            <buildTarget>marathon</buildTarget>
-            <serviceLocator.provider.groupName>com.lightbend</serviceLocator.provider.groupName>
-            <serviceLocator.provider.artifactName>lagom14-java-service-locator-dns_${scala.binary.version}</serviceLocator.provider.artifactName>
-            <serviceLocator.provider.artifactVersion>2.2.3</serviceLocator.provider.artifactVersion>
-        </properties>
         <activation>
             <property>
                 <name>buildTarget</name>
@@ -239,14 +212,9 @@
         </activation>
         <dependencies>
             <dependency>
-                <groupId>de.heikoseeberger</groupId>
-                <artifactId>constructr_${scala.binary.version}</artifactId>
-                <version>0.17.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.lightbend.constructr</groupId>
-                <artifactId>constructr-coordination-zookeeper_${scala.binary.version}</artifactId>
-                <version>0.4.0</version>
+                <groupId>com.lightbend.akka.discovery</groupId>
+                <artifactId>akka-discovery-marathon-api_${scala.binary.version}</artifactId>
+                <version>0.10.0</version>
             </dependency>
         </dependencies>
         <build>

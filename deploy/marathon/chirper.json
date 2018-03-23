@@ -1,0 +1,122 @@
+{
+  "id": "/chirper",
+  "apps": [
+    {
+      "id": "/chirper/activityservice",
+      "container": {
+        "docker": {
+          "image": "boot.dcos:5000/activity-stream-impl:1.13-SNAPSHOT",
+          "network": "BRIDGE",
+          "portMappings": [
+            { "containerPort": 0, "servicePort": 0, "name": "http" }
+          ]
+        }
+      },
+      "cpus": 0.25,
+      "mem": 512.0,
+      "instances": 1,
+      "env": {
+        "RP_PLATFORM": "mesos",
+        "RP_NAMESPACE": "chirper",
+        "APPLICATION_SECRET": "changeme"
+      },
+      "labels": {
+        "HAPROXY_GROUP": "external",
+        "HAPROXY_0_VHOST": "chirper.dcos",
+        "HAPROXY_0_PATH": "/api/activity"
+      }
+    },
+    {
+      "id": "/chirper/chirpservice",
+      "container": {
+        "docker": {
+          "image": "boot.dcos:5000/chirp-impl:1.13-SNAPSHOT",
+          "network": "BRIDGE",
+          "portMappings": [
+            { "containerPort": 0, "servicePort": 0, "name": "http" },
+            { "containerPort": 0, "servicePort": 0, "name": "akkaremote" },
+            { "containerPort": 0, "servicePort": 0, "name": "akkamgmthttp" }
+          ]
+        }
+      },
+      "cpus": 0.25,
+      "mem": 512.0,
+      "instances": 2,
+      "upgradeStrategy": {
+        "maximumOverCapacity": 0,
+        "minimumHealthCapacity": 0.5
+      },
+      "killSelection": "YOUNGEST_FIRST",
+      "env": {
+        "RP_PLATFORM": "mesos",
+        "RP_NAMESPACE": "chirper",
+        "CASSANDRA_SERVICE_NAME": "_native-client._node-0-server._tcp.cassandra.mesos",
+        "APPLICATION_SECRET": "changeme"
+      },
+      "labels": {
+        "ACTOR_SYSTEM_NAME": "chirpservice",
+        "HAPROXY_GROUP": "external",
+        "HAPROXY_0_VHOST": "chirper.dcos",
+        "HAPROXY_0_PATH": "/api/chirps"
+      }
+    },
+    {
+      "id": "/chirper/friendservice",
+      "container": {
+        "docker": {
+          "image": "boot.dcos:5000/friend-impl:1.13-SNAPSHOT",
+          "network": "BRIDGE",
+          "portMappings": [
+            { "containerPort": 0, "servicePort": 0, "name": "http" },
+            { "containerPort": 0, "servicePort": 0, "name": "akkaremote" },
+            { "containerPort": 0, "servicePort": 0, "name": "akkamgmthttp" }
+          ]
+        }
+      },
+      "cpus": 0.25,
+      "mem": 512.0,
+      "instances": 2,
+      "upgradeStrategy": {
+        "maximumOverCapacity": 0,
+        "minimumHealthCapacity": 0.5
+      },
+      "killSelection": "YOUNGEST_FIRST",
+      "env": {
+        "RP_PLATFORM": "mesos",
+        "RP_NAMESPACE": "chirper",
+        "CASSANDRA_SERVICE_NAME": "_native-client._node-0-server._tcp.cassandra.mesos",
+        "APPLICATION_SECRET": "changeme"
+      },
+      "labels": {
+        "ACTOR_SYSTEM_NAME": "friendservice",
+        "HAPROXY_GROUP": "external",
+        "HAPROXY_0_VHOST": "chirper.dcos",
+        "HAPROXY_0_PATH": "/api/users"
+      }
+    },
+    {
+      "id": "/chirper/front-end",
+      "container": {
+        "docker": {
+          "image": "boot.dcos:5000/front-end:1.13-SNAPSHOT",
+          "network": "BRIDGE",
+          "portMappings": [
+            { "containerPort": 0, "servicePort": 0, "name": "http" }
+          ]
+        }
+      },
+      "cpus": 0.25,
+      "mem": 512.0,
+      "instances": 1,
+      "env": {
+        "RP_PLATFORM": "mesos",
+        "RP_NAMESPACE": "chirper",
+        "APPLICATION_SECRET": "changeme"
+      },
+      "labels": {
+        "HAPROXY_GROUP": "external",
+        "HAPROXY_0_VHOST": "chirper.dcos"
+      }
+    }
+  ]
+}

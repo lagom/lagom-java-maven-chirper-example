@@ -1,0 +1,29 @@
+---
+apiVersion: "extensions/v1beta1"
+kind: Ingress
+metadata:
+  name: chirper
+spec:
+  rules:
+    - http:
+        paths:
+          - path: "/api/chirps/history"
+            backend:
+              serviceName: chirpservice
+              servicePort: 10000
+          - path: "/api/chirps/live"
+            backend:
+              serviceName: chirpservice
+              servicePort: 10000
+          - path: "/api/activity"
+            backend:
+              serviceName: activityservice
+              servicePort: 10000
+          - path: "/api/users"
+            backend:
+              serviceName: friendservice
+              servicePort: 10000
+          - path: "/"
+            backend:
+              serviceName: "front-end"
+              servicePort: 10000

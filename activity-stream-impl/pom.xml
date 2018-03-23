@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.lightbend.lagom.sample.chirper</groupId>
         <artifactId>lagom-java-chirper</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>activity-stream-impl</artifactId>
@@ -35,14 +35,6 @@
         </dependency>
         <dependency>
             <groupId>com.lightbend.lagom</groupId>
-            <artifactId>lagom-javadsl-pubsub_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lightbend.lagom</groupId>
-            <artifactId>lagom-javadsl-persistence-cassandra_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lightbend.lagom</groupId>
             <artifactId>lagom-logback_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
@@ -54,45 +46,22 @@
             <artifactId>lagom-javadsl-testkit_${scala.binary.version}</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Service Locator Provider -->
+
+        <!-- reactive-lib service locator -->
         <dependency>
-            <groupId>${serviceLocator.provider.groupName}</groupId>
-            <artifactId>${serviceLocator.provider.artifactName}</artifactId>
+            <groupId>com.lightbend.rp</groupId>
+            <artifactId>reactive-lib-service-discovery-lagom14-java_${scala.binary.version}</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/conductr-bundle.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>conductr-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.lightbend.lagom</groupId>
                 <artifactId>lagom-maven-plugin</artifactId>
                 <configuration>
                     <lagomService>true</lagomService>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>renameConductRBundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
@@ -103,7 +72,7 @@
                         <image>
                             <build>
                                 <entryPoint>
-                                    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp '/maven/*' -Dhttp.address="$(eval "echo $ACTIVITYSERVICE_BIND_IP")" -Dhttp.port="$(eval "echo $ACTIVITYSERVICE_BIND_PORT")" play.core.server.ProdServerStart
+                                    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp '/maven/*' play.core.server.ProdServerStart
                                 </entryPoint>
                             </build>
                         </image>

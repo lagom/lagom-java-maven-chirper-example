@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.lightbend.lagom.sample.chirper</groupId>
         <artifactId>lagom-java-chirper</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>front-end</artifactId>
@@ -46,45 +46,16 @@
             <groupId>com.typesafe.play</groupId>
             <artifactId>play-netty-server_${scala.binary.version}</artifactId>
         </dependency>
-        <!-- Service Locator Provider -->
-        <dependency>
-            <groupId>${serviceLocator.provider.groupName}</groupId>
-            <artifactId>${serviceLocator.provider.artifactName}</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/conductr-bundle.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>conductr-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>com.lightbend.lagom</groupId>
                 <artifactId>lagom-maven-plugin</artifactId>
                 <configuration>
                     <playService>true</playService>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>renameConductRBundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.jakewharton.twirl</groupId>
@@ -189,7 +160,7 @@
                         <image>
                             <build>
                                 <entryPoint>
-                                    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp '/maven/*' -Dhttp.address="$(eval "echo $WEB_BIND_IP")" -Dhttp.port="$(eval "echo $WEB_BIND_PORT")" play.core.server.ProdServerStart
+                                    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp '/maven/*' play.core.server.ProdServerStart
                                 </entryPoint>
                             </build>
                         </image>

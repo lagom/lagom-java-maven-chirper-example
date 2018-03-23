@@ -1,0 +1,45 @@
+---
+apiVersion: "apps/v1beta2"
+kind: Deployment
+metadata:
+  name: front-end
+  labels:
+    app: front-end
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-end
+  template:
+    metadata:
+      labels:
+        app: front-end
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: front-end
+          image: "front-end:1.0.0-SNAPSHOT"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: "RP_PLATFORM"
+              value: kubernetes
+            - name: "APPLICATION_SECRET"
+              value: "changeme"
+          ports:
+            - containerPort: 10000
+              name: "http"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: front-end
+  name: front-end
+spec:
+  ports:
+    - name: "http"
+      port: 10000
+      protocol: TCP
+      targetPort: 10000
+  selector:
+    app: front-end

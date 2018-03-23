@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.lightbend.lagom.sample.chirper</groupId>
         <artifactId>lagom-java-chirper</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>chirp-impl</artifactId>
@@ -44,45 +44,36 @@
             <artifactId>lagom-javadsl-testkit_${scala.binary.version}</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Service Locator Provider -->
+
+        <!-- akka management (cluster formation) -->
         <dependency>
-            <groupId>${serviceLocator.provider.groupName}</groupId>
-            <artifactId>${serviceLocator.provider.artifactName}</artifactId>
+            <groupId>com.lightbend.akka.management</groupId>
+            <artifactId>akka-management_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lightbend.akka.management</groupId>
+            <artifactId>akka-management-cluster-bootstrap_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lightbend.akka.discovery</groupId>
+            <artifactId>akka-discovery-dns_${scala.binary.version}</artifactId>
+        </dependency>
+
+        <!-- reactive-lib service locator -->
+        <dependency>
+            <groupId>com.lightbend.rp</groupId>
+            <artifactId>reactive-lib-service-discovery-lagom14-java_${scala.binary.version}</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/conductr-bundle.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>conductr-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.lightbend.lagom</groupId>
                 <artifactId>lagom-maven-plugin</artifactId>
                 <configuration>
                     <lagomService>true</lagomService>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>renameConductRBundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
@@ -93,7 +84,7 @@
                         <image>
                             <build>
                                 <entryPoint>
-                                    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp '/maven/*' -Dhttp.address="$(eval "echo $CHIRPSERVICE_BIND_IP")" -Dhttp.port="$(eval "echo $CHIRPSERVICE_BIND_PORT")" -Dakka.remote.netty.tcp.hostname="$(eval "echo $AKKA_REMOTING_HOST")" -Dakka.remote.netty.tcp.bind-hostname="$(eval "echo $AKKA_REMOTING_BIND_HOST")" -Dakka.remote.netty.tcp.port="$(eval "echo $AKKA_REMOTING_PORT")" -Dakka.remote.netty.tcp.bind-port="$(eval "echo $AKKA_REMOTING_BIND_PORT")" $(IFS=','; I=0; for NODE in $AKKA_SEED_NODES; do echo "-Dakka.cluster.seed-nodes.$I=akka.tcp://chirpservice@$NODE"; I=$(expr $I + 1); done) play.core.server.ProdServerStart
+                                    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp '/maven/*' play.core.server.ProdServerStart
                                 </entryPoint>
                             </build>
                         </image>

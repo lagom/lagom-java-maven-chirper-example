@@ -1,0 +1,59 @@
+---
+apiVersion: "apps/v1beta2"
+kind: Deployment
+metadata:
+  name: friendservice
+  labels:
+    app: friendservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: friendservice
+  template:
+    metadata:
+      labels:
+        app: friendservice
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: friendservice
+          image: "friend-impl:1.0.0-SNAPSHOT"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: "RP_PLATFORM"
+              value: kubernetes
+            - name: "APPLICATION_SECRET"
+              value: "changeme"
+            - name: "CASSANDRA_SERVICE_NAME"
+              value: "_cql._tcp.reactive-sandbox-cassandra.default.svc.cluster.local"
+          ports:
+            - containerPort: 10000
+              name: "http"
+            - containerPort: 10001
+              name: "akka-remote"
+            - containerPort: 10002
+              name: "akka-mgmt-http"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: friendservice
+  name: friendservice
+spec:
+  ports:
+    - name: "http"
+      port: 10000
+      protocol: TCP
+      targetPort: 10000
+    - name: "akka-remote"
+      port: 10001
+      protocol: TCP
+      targetPort: 10001
+    - name: "akka-mgmt-http"
+      port: 10002
+      protocol: TCP
+      targetPort: 10002
+  selector:
+    app: friendservice

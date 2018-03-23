@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.lightbend.lagom.sample.chirper</groupId>
         <artifactId>lagom-java-chirper</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>activity-stream-api</artifactId>

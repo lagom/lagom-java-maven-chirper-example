@@ -1,0 +1,46 @@
+---
+apiVersion: "apps/v1beta2"
+kind: Deployment
+metadata:
+  name: activityservice
+  labels:
+    app: activityservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: activityservice
+  template:
+    metadata:
+      labels:
+        app: activityservice
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: activityservice
+          image: "activity-stream-impl:1.0.0-SNAPSHOT"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: "RP_PLATFORM"
+              value: kubernetes
+            - name: "APPLICATION_SECRET"
+              value: "changeme"
+          ports:
+            - containerPort: 10000
+              name: "http"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: activityservice
+  name: activityservice
+spec:
+  ports:
+    - name: "http"
+      port: 10000
+      protocol: TCP
+      targetPort: 10000
+  selector:
+    app: activityservice
+
