@@ -171,7 +171,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lagom.version>1.4.6</lagom.version>
+        <lagom.version>1.4.7</lagom.version>
         <scala.binary.version>2.12</scala.binary.version>
     </properties>
 
