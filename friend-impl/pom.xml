@@ -55,15 +55,41 @@
             <artifactId>akka-discovery-dns_${scala.binary.version}</artifactId>
         </dependency>
 
+        <!-- for reactive-app-maven-plugin -->
+        <dependency>
+            <groupId>com.lightbend.lagom</groupId>
+            <artifactId>api-tools_${scala.binary.version}</artifactId>
+            <version>${lagom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lightbend.rp</groupId>
+            <artifactId>reactive-lib-akka-cluster-bootstrap_${scala.binary.version}</artifactId>
+            <version>0.8.2</version>
+        </dependency>
+
         <!-- reactive-lib service locator -->
         <dependency>
             <groupId>com.lightbend.rp</groupId>
             <artifactId>reactive-lib-service-discovery-lagom14-java_${scala.binary.version}</artifactId>
+            <version>0.8.2</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.lightbend.rp</groupId>
+                <artifactId>reactive-app-maven-plugin</artifactId>
+                <version>0.3.0</version>
+                <executions>
+                    <execution>
+                        <id>build-docker</id>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.lightbend.lagom</groupId>
                 <artifactId>lagom-maven-plugin</artifactId>
