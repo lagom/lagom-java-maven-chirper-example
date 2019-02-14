@@ -23,24 +23,24 @@
 
     <build>
         <plugins>
-          <plugin>
-          		<groupId>org.apache.maven.plugins</groupId>
-          		<artifactId>maven-antrun-plugin</artifactId>
-          		<version>1.7</version>
-          		<executions>
-          		    <execution>
-          		        <phase>validate</phase>
-          		          <goals>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                          <target>
-                            <echo>Build target: ${buildTarget}</echo>
-                          </target>
+                            <target>
+                                <echo>Build target: ${buildTarget}</echo>
+                            </target>
                         </configuration>
-          		    </execution>
-          		</executions>
-          	</plugin>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.6</version>
@@ -164,69 +164,69 @@
             <dependency>
                 <groupId>com.lightbend.rp</groupId>
                 <artifactId>reactive-lib-service-discovery-lagom14-java_${scala.binary.version}</artifactId>
-                <version>0.6.0</version>
+                <version>1.7.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lagom.version>1.4.9</lagom.version>
+        <lagom.version>1.4.11</lagom.version>
         <scala.binary.version>2.12</scala.binary.version>
     </properties>
 
     <profiles>
-      <profile>
-        <id>kubernetes</id>
-        <activation>
-          <property>
-              <name>buildTarget</name>
-              <value>kubernetes</value>
-          </property>
-        </activation>
-        <dependencies>
-          <dependency>
-              <groupId>com.lightbend.akka.discovery</groupId>
-              <artifactId>akka-discovery-kubernetes-api_${scala.binary.version}</artifactId>
-              <version>0.10.0</version>
-          </dependency>
-        </dependencies>
-        <build>
-          <resources>
-              <resource>
-                  <directory>src/main/resources</directory>
-              </resource>
-              <resource>
-                  <directory>src/main/kubernetes-resources</directory>
-              </resource>
-          </resources>
-        </build>
-      </profile>
-      <profile>
-        <id>marathon</id>
-        <activation>
-            <property>
-                <name>buildTarget</name>
-                <value>marathon</value>
-            </property>
-        </activation>
-        <dependencies>
-            <dependency>
-                <groupId>com.lightbend.akka.discovery</groupId>
-                <artifactId>akka-discovery-marathon-api_${scala.binary.version}</artifactId>
-                <version>0.10.0</version>
-            </dependency>
-        </dependencies>
-        <build>
-          <resources>
-              <resource>
-                  <directory>src/main/resources</directory>
-              </resource>
-              <resource>
-                  <directory>src/main/marathon-resources</directory>
-              </resource>
-          </resources>
-        </build>
-      </profile>
+        <profile>
+            <id>kubernetes</id>
+            <activation>
+                <property>
+                    <name>buildTarget</name>
+                    <value>kubernetes</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.lightbend.akka.discovery</groupId>
+                    <artifactId>akka-discovery-kubernetes-api_${scala.binary.version}</artifactId>
+                    <version>0.10.0</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/kubernetes-resources</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>marathon</id>
+            <activation>
+                <property>
+                    <name>buildTarget</name>
+                    <value>marathon</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.lightbend.akka.discovery</groupId>
+                    <artifactId>akka-discovery-marathon-api_${scala.binary.version}</artifactId>
+                    <version>0.10.0</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/marathon-resources</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
     </profiles>
 </project>

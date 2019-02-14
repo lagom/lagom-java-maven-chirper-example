@@ -4,7 +4,7 @@ import akka.Done;
 import akka.NotUsed;
 import akka.actor.ActorSystem;
 import akka.stream.javadsl.Source;
-import akka.testkit.JavaTestKit;
+import akka.testkit.javadsl.TestKit;
 import com.lightbend.lagom.javadsl.testkit.PersistentEntityTestDriver;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -28,7 +28,7 @@ public class ChirpTimelineEntityTest {
 
     @AfterClass
     public static void teardown() {
-        JavaTestKit.shutdownActorSystem(system);
+        TestKit.shutdownActorSystem(system);
         system = null;
     }
 

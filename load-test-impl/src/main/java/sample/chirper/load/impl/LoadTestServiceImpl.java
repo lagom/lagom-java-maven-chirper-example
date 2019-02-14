@@ -5,6 +5,8 @@ package sample.chirper.load.impl;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -114,7 +116,7 @@ public class LoadTestServiceImpl implements LoadTestService {
     Source<String, ?> writes = Source.from(Arrays.asList(createdUsers, addedFriends, postedChirps))
         .flatMapConcat(s -> s);
 
-    final FiniteDuration interval = FiniteDuration.create(5, TimeUnit.SECONDS);
+    final Duration interval = Duration.ofSeconds(5);
     Source<String, ?> clientsThroughput = Source.tick(interval, interval, "tick")
         .scan(new Throughput(System.nanoTime(), System.nanoTime(), 0, 0), (t, tick) -> {
           long now = System.nanoTime();
@@ -148,7 +150,7 @@ public class LoadTestServiceImpl implements LoadTestService {
     return Flow.of(NotUsed.class)
       .scan(0, (count, elem) -> count + 1)
       .drop(1)
-      .groupedWithin(1000, FiniteDuration.create(1, TimeUnit.SECONDS))
+      .groupedWithin(1000, Duration.ofSeconds(1))
       .map(list -> list.get(list.size() - 1))
       .map(c -> title + ": " + c);
   }
