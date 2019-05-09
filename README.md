@@ -1,3 +1,5 @@
+This sample application is archived. See https://github.com/lagom/lagom-samples for more Example projects showcasing Lagom usage.
+
 # lagom-java-maven-chirper-example
 
 A Lagom Java example showcasing a Twitter-like application, [Maven](https://maven.apache.org/) flavor.
